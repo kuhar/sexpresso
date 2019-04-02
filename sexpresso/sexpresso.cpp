@@ -235,6 +235,45 @@ namespace sexpresso {
 		return this->kind == SexpValueKind::SEXP && this->childCount() == 0;
 	}
 
+	auto Sexp::isNumber() const -> bool {
+	  if (!isString())
+	    return false;
+
+	  const std::string &str = this->value.str;
+	  if (str.empty())
+	    return false;
+
+	  const bool isNegative = (str[0] == '-');
+	  std::string::const_iterator it = str.begin();
+	  if (isNegative)
+	    ++it;
+
+	  const auto begin = it;
+	  const std::string::const_iterator end = str.end();
+	  while (it != end) {
+	    if (it == begin && *it == '0')
+	      return false;
+
+	    if (*it <= '0' || *it >= '9')
+	      return false;
+
+	    ++it;
+	  }
+
+	  return true;
+	}
+
+	auto Sexp::toNumber() const -> long long {
+	  assert(isNumber());
+
+	  std::istringstream iss(this->value.str);
+	  long long ret = 0;
+	  const bool success = bool(iss >> ret);
+	  assert(success);
+
+	  return ret;
+	}
+
 	static auto childrenEqual(std::vector<Sexp> const& a, std::vector<Sexp> const& b) -> bool {
 		if(a.size() != b.size()) return false;
 

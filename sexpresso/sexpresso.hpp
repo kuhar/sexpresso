@@ -37,6 +37,8 @@ namespace sexpresso {
 		auto isString() const -> bool;
 		auto isSexp() const -> bool;
 		auto isNil() const -> bool;
+		auto isNumber() const -> bool;
+		auto toNumber() const -> long long;
 		auto equal(Sexp const& other) const -> bool;
 		auto arguments() -> SexpArgumentRange;
 		static auto unescaped(std::string strval) -> Sexp;
