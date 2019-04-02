@@ -14,7 +14,7 @@
 namespace sexpresso {
 	enum class SexpValueKind : uint8_t { SEXP, STRING };
 
-	struct SexpArgumentIterator;
+	struct SexpArgumentRange;
 
 	struct Sexp {
 		Sexp();
@@ -26,6 +26,7 @@ namespace sexpresso {
 		auto addChild(std::string str) -> void;
 		auto addChildUnescaped(std::string str) -> void;
 		auto addExpression(std::string const& str) -> void;
+		auto getHead() -> Sexp&;
 		auto childCount() const -> size_t;
 		auto getChild(size_t idx) -> Sexp&; // Call only if Sexp is a Sexp
 		auto getString() -> std::string&;
@@ -37,7 +38,7 @@ namespace sexpresso {
 		auto isSexp() const -> bool;
 		auto isNil() const -> bool;
 		auto equal(Sexp const& other) const -> bool;
-		auto arguments() -> SexpArgumentIterator;
+		auto arguments() -> SexpArgumentRange;
 		static auto unescaped(std::string strval) -> Sexp;
 	};
 
@@ -45,8 +46,8 @@ namespace sexpresso {
 	auto parse(std::string const& str) -> Sexp;
 	auto escape(std::string const& str) -> std::string;
 
-	struct SexpArgumentIterator {
-		SexpArgumentIterator(Sexp& sexp);
+	struct SexpArgumentRange {
+		SexpArgumentRange(Sexp& sexp);
 		Sexp& sexp;
 
 		using iterator = std::vector<Sexp>::iterator;

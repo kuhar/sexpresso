@@ -7,6 +7,7 @@
 #endif
 #include "sexpresso.hpp"
 
+#include <cassert>
 #include <cctype>
 #include <stack>
 #include <algorithm>
@@ -47,6 +48,11 @@ namespace sexpresso {
 		auto sexp = parse(str, err);
 		if(!err.empty()) return;
 		for(auto&& c : sexp.value.sexp) this->addChild(std::move(c));
+	}
+
+	auto Sexp::getHead() -> Sexp & {
+			assert(childCount() >= 1);
+			return getChild(0);
 	}
 
 	auto Sexp::childCount() const -> size_t {
@@ -249,8 +255,8 @@ namespace sexpresso {
 		}
 	}
 
-	auto Sexp::arguments() -> SexpArgumentIterator {
-		return SexpArgumentIterator{*this};
+	auto Sexp::arguments() -> SexpArgumentRange {
+		return SexpArgumentRange{*this};
 	}
 
 	auto Sexp::unescaped(std::string strval) -> Sexp {
@@ -363,23 +369,23 @@ namespace sexpresso {
 		return std::move(result_str);
 	}
 
-	SexpArgumentIterator::SexpArgumentIterator(Sexp& sexp) : sexp(sexp) {}
+	SexpArgumentRange::SexpArgumentRange(Sexp& sexp) : sexp(sexp) {}
 
-	auto SexpArgumentIterator::begin() -> iterator {
+	auto SexpArgumentRange::begin() -> iterator {
 		if(this->size() == 0) return this->end(); else return ++(this->sexp.value.sexp.begin());
 	}
 
-	auto SexpArgumentIterator::end() -> iterator { return this->sexp.value.sexp.end(); }
+	auto SexpArgumentRange::end() -> iterator { return this->sexp.value.sexp.end(); }
 
-	auto SexpArgumentIterator::begin() const -> const_iterator {
+	auto SexpArgumentRange::begin() const -> const_iterator {
 		if(this->size() == 0) return this->end(); else return ++(this->sexp.value.sexp.begin());
 	}
 
-	auto SexpArgumentIterator::end() const -> const_iterator { return this->sexp.value.sexp.end(); }
+	auto SexpArgumentRange::end() const -> const_iterator { return this->sexp.value.sexp.end(); }
 
-	auto SexpArgumentIterator::empty() const -> bool { return this->size() == 0;}
+	auto SexpArgumentRange::empty() const -> bool { return this->size() == 0;}
 
-	auto SexpArgumentIterator::size() const -> size_t {
+	auto SexpArgumentRange::size() const -> size_t {
 		auto sz = this->sexp.value.sexp.size();
 		if(sz == 0) return 0; else return sz-1;
 	}

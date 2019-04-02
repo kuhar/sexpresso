@@ -105,7 +105,7 @@ for(auto&& it = hi.arguments().begin(); it != hi.arguments().end(); ++it) {
 #+END_SRC
 
 You can also check if the arguments are empty and how many there are with the ~empty~ and ~size~ methods
-of the ~SexpArgumentIterator~ class.
+of the ~SexpArgumentRange~ class.
 
 *WARNING* Be *REALLY* careful that your query result does not exceed the lifetime of
 the parse tree:
