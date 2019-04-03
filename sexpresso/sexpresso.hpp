@@ -69,6 +69,43 @@ struct SexpArgumentRange {
   auto size() const -> size_t;
   auto empty() const -> bool;
 };
+
+struct SexpPostOrderView {
+  Sexp *sexp;
+  Sexp *parent;
+  bool isHead;
+
+  template <typename OS>
+  friend OS &operator<<(OS &os, const SexpPostOrderView &view) {
+    os << "elem: ";
+    if (view.sexp)
+      os << (view.sexp->isNil() ? "nil" : view.sexp->getString());
+    else
+      os << "nullptr";
+    os << ", parent: " << view.parent;
+
+    if (view.isHead)
+      os << " (head)";
+
+    return os;
+  }
+};
+
+class SexpPostOrderRange {
+  using WorkListTy = std::vector<SexpPostOrderView>;
+  WorkListTy worklist;
+
+public:
+  using iterator = WorkListTy::reverse_iterator;
+
+  SexpPostOrderRange(Sexp &sexp);
+
+  auto begin() -> iterator { return worklist.rbegin(); }
+  auto end() -> iterator { return worklist.rend(); }
+  auto size() const -> size_t { return worklist.size(); }
+  auto empty() const -> bool { return worklist.empty(); }
+};
+
 } // namespace sexpresso
 
 #endif // SEXPRESSO_HEADER

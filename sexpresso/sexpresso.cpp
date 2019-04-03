@@ -475,4 +475,44 @@ auto SexpArgumentRange::size() const -> size_t {
 
   return sz - 1;
 }
+
+SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
+  std::vector<std::pair<Sexp *, unsigned>> stack;
+
+  for (unsigned i = 0, e = sexp.childCount(); i != e; ++i) {
+    unsigned j = e - i - 1;
+    stack.push_back({&sexp, j});
+  }
+
+  while (!stack.empty()) {
+    auto sexpIdx = stack.back();
+    Sexp &currentParent = *sexpIdx.first;
+    const unsigned idx = sexpIdx.second;
+    Sexp &current = currentParent.getChild(idx);
+
+    stack.pop_back();
+
+    if (current.isString() || current.isNil()) {
+      this->worklist.push_back({&current, &currentParent, idx == 0});
+      continue;
+    }
+
+    for (unsigned i = 0, e = current.childCount(); i != e; ++i) {
+      unsigned j = e - i - 1;
+      stack.push_back({&current, j});
+    }
+  }
+
+  for (SexpPostOrderView v : this->worklist) {
+    assert(v.sexp || v.parent);
+    if (!v.sexp) {
+      assert(v.parent);
+      assert(!v.parent->isNil());
+    } else {
+      assert(v.sexp);
+      assert(!v.sexp->isSexp());
+    }
+  }
+}
+
 } // namespace sexpresso
