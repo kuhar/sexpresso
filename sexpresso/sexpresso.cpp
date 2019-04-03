@@ -476,6 +476,22 @@ auto SexpArgumentRange::size() const -> size_t {
   return sz - 1;
 }
 
+Sexp& SexpPostOrderView::getHead() {
+  assert(parent);
+  assert(parent->childCount() > 0);
+  return parent->getHead();
+}
+
+const Sexp& SexpPostOrderView::getHead() const {
+  assert(parent);
+  assert(parent->childCount() > 0);
+  return parent->getHead();
+}
+
+bool SexpPostOrderView::isHead() const {
+  return sexp == &getHead();
+}
+
 SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
   std::vector<std::pair<Sexp *, unsigned>> stack;
 
@@ -493,7 +509,7 @@ SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
     stack.pop_back();
 
     if (current.isString() || current.isNil()) {
-      this->worklist.push_back({&current, &currentParent, idx == 0});
+      this->worklist.push_back({&current, &currentParent});
       continue;
     }
 
@@ -504,7 +520,7 @@ SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
   }
 
   for (SexpPostOrderView v : this->worklist) {
-    assert(v.sexp || v.parent);
+    assert(v.parent);
     if (!v.sexp) {
       assert(v.parent);
       assert(!v.parent->isNil());

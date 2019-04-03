@@ -49,6 +49,10 @@ struct Sexp {
   auto equal(Sexp const &other) const -> bool;
   auto arguments() -> SexpArgumentRange;
   static auto unescaped(std::string strval) -> Sexp;
+
+  template <typename OS> friend OS &operator<<(OS &os, const Sexp &sexp) {
+    return (os << sexp.toString());
+  }
 };
 
 auto parse(std::string const &str, std::string &err) -> Sexp;
@@ -73,22 +77,23 @@ struct SexpArgumentRange {
 struct SexpPostOrderView {
   Sexp *sexp;
   Sexp *parent;
-  bool isHead;
 
   template <typename OS>
   friend OS &operator<<(OS &os, const SexpPostOrderView &view) {
     os << "elem: ";
     if (view.sexp)
-      os << (view.sexp->isNil() ? "nil" : view.sexp->getString());
+      os << *view.sexp;
     else
       os << "nullptr";
-    os << ", parent: " << view.parent;
-
-    if (view.isHead)
-      os << " (head)";
+    os << ", parent: " << view.parent
+       << ", head: " << view.getHead();
 
     return os;
   }
+
+  bool isHead() const;
+  Sexp &getHead();
+  const Sexp &getHead() const;
 };
 
 class SexpPostOrderRange {
