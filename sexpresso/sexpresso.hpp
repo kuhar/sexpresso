@@ -20,6 +20,13 @@ namespace sexpresso {
 		Sexp();
 		Sexp(std::string const& strval);
 		Sexp(std::vector<Sexp> const& sexpval);
+
+		Sexp(const Sexp& other) = default;
+		Sexp(Sexp&& other) = default;
+
+		Sexp& operator=(const Sexp& other) = default;
+                Sexp& operator=(Sexp&& other) = default;
+
 		SexpValueKind kind;
 		struct { std::vector<Sexp> sexp; std::string str; } value;
 		auto addChild(Sexp sexp) -> void;
