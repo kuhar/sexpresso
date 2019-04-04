@@ -495,10 +495,11 @@ bool SexpPostOrderView::isHead() const {
 SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
   std::vector<std::pair<Sexp *, unsigned>> stack;
 
-  for (unsigned i = 0, e = sexp.childCount(); i != e; ++i) {
-    unsigned j = e - i - 1;
-    stack.push_back({&sexp, j});
-  }
+  for (unsigned i = 1, e = sexp.childCount(); i < e; ++i)
+    stack.push_back({&sexp, i});
+
+  if (sexp.childCount() > 0)
+    stack.push_back({&sexp, 0});
 
   while (!stack.empty()) {
     auto sexpIdx = stack.back();
@@ -513,10 +514,11 @@ SexpPostOrderRange::SexpPostOrderRange(sexpresso::Sexp &sexp) {
       continue;
     }
 
-    for (unsigned i = 0, e = current.childCount(); i != e; ++i) {
-      unsigned j = e - i - 1;
-      stack.push_back({&current, j});
-    }
+    for (unsigned i = 1, e = current.childCount(); i < e; ++i)
+      stack.push_back({&current, i});
+
+    if (current.childCount() > 0)
+      stack.push_back({&current, 0});
   }
 
   for (SexpPostOrderView v : this->worklist) {
