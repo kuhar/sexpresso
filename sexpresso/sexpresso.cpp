@@ -264,19 +264,7 @@ auto Sexp::isNumber() const -> bool {
   if (isNegative)
     ++it;
 
-  const auto begin = it;
-  const std::string::const_iterator end = str.end();
-  while (it != end) {
-    if (it == begin && *it == '0')
-      return false;
-
-    if (*it <= '0' || *it >= '9')
-      return false;
-
-    ++it;
-  }
-
-  return true;
+  return std::all_of(it, str.end(), ::isdigit);
 }
 
 auto Sexp::toNumber() const -> long long {
